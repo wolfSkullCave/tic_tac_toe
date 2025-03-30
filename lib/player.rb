@@ -8,7 +8,5 @@ class Player
 end
 
 module Player
-  def set_player_1
-    
-  end
+  def set_player_1; end
 end
