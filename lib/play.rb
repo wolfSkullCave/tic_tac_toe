@@ -76,7 +76,7 @@ class Play < Board
       self.board[:b2] == player && 
       self.board[:b3] == player
       return true
-    elsif self.board[:a2] == player && 
+    elsif self.board[:a1] == player && 
       self.board[:b2] == player && 
       self.board[:c3] == player
       return true
