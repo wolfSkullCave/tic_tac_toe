@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 require_relative 'lib/play'
 
-start = Play.new
-start.move
+# Initialize the game and start the first move
+play = Play.new
+play.move

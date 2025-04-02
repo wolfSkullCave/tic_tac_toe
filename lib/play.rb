@@ -1,124 +1,75 @@
+# frozen_string_literal: true
+
 require_relative 'board'
 require 'colorize'
 
 class Play < Board
-  attr_accessor :player_1, :player_2
+  attr_accessor :player1, :player2
 
   def initialize
     super()
-    @player_1 = "X".colorize(:blue)
-    @player_2 = "O".colorize(:green)
+    @player1 = 'X'.colorize(:blue)
+    @player2 = 'O'.colorize(:green)
   end
 
   def move
-    loop do
-      puts setup      
-
-      # Player 1's turn
-      move_player(self.player_1)
-      draw
-      if win_condition?(self.player_1)
-        puts "Player #{self.player_1} wins!".colorize(:yellow)
-        break
-      elsif full? # check for a draw
-        puts "Its a draw".colorize(:yellow)
-        break
-      end
-
-      # Player 2's turn
-      move_player(self.player_2)
-      draw
-      if win_condition?(self.player_2)
-        puts "Player #{self.player_2} wins!".colorize(:yellow)
-        break
-      elsif full? # check for a draw
-        puts "Its a draw".colorize(:yellow)
-        break
-      end
+    [player1, player2].cycle do |current_player|
+      break if turn(current_player)
     end
   end
 
   private
 
+  # Handles a player's turn and checks for game-ending conditions.
+  def turn(player)
+    board_positions
+
+    move_player(player)
+    draw
+    if winner?(player)
+      puts "Player #{player} wins!".colorize(:yellow)
+      true
+    elsif full?
+      puts 'It\'s a draw'.colorize(:yellow)
+      true
+    else
+      false
+    end
+  end
+
+  # Prompts the player to make a valid move.
   def move_player(player)
     loop do
-      puts "Player #{player} move:"
+      puts "Player #{player}, make your move:"
       move = gets.chomp.to_sym
 
-      # Check if move is valid
-      if self.board[move] && self.board[move] == ' '
-        self.board[move] = player
-        break # Exit loop when a valid move is made
+      if valid_move?(move)
+        board[move] = player
+        break
       else
-        puts "Invalid move: #{move}. Please try again"
+        puts "Invalid move: #{move}. Please try again."
       end
     end
   end
 
-  def win_condition?(player)
-    # top row (a) win conditions
-    if self.board[:a1] == player && 
-      self.board[:a2] == player && 
-      self.board[:a3] == player
-      return true
-    elsif self.board[:a1] == player && 
-      self.board[:b1] == player && 
-      self.board[:c1] == player
-      return true
-    elsif self.board[:a1] == player && 
-      self.board[:b2] == player && 
-      self.board[:c3] == player
-      return true
-    end
-
-    # b row win conditions
-    if self.board[:b1] == player && 
-      self.board[:b2] == player && 
-      self.board[:b3] == player
-      return true
-    elsif self.board[:a1] == player && 
-      self.board[:b2] == player && 
-      self.board[:c3] == player
-      return true
-    elsif self.board[:a1] == player && 
-      self.board[:b2] == player && 
-      self.board[:c3] == player
-      return true
-    end
-
-    # c row win conditions
-    if self.board[:c1] == player && 
-      self.board[:c2] == player && 
-      self.board[:c3] == player
-      return true
-    elsif self.board[:c1] == player && 
-      self.board[:b2] == player && 
-      self.board[:a3] == player
-      return true
-    elsif self.board[:a1] == player && 
-      self.board[:b2] == player && 
-      self.board[:c3] == player
-      return true
-    end
-
-    return false
+  # Checks if the move is valid.
+  def valid_move?(move)
+    board[move] && board[move] == ' '
   end
 
-  def test_win_conditions
-    board = Board.new
-    puts board.full? # Should return false (board is empty)
-
-    board.board[:a1] = 'X'
-    board.board[:a2] = 'O'
-    board.board[:a3] = 'X'
-    board.board[:b1] = 'O'
-    board.board[:b2] = 'X'
-    board.board[:b3] = 'O'
-    board.board[:c1] = 'X'
-    board.board[:c2] = 'O'
-    board.board[:c3] = 'X'
-
-    puts board.full? # Should return true (board is full)
+  # Checks if the player has a winning combination.
+  def winner?(player)
+    winning_combinations.any? do |combination|
+      combination.all? { |position| board[position] == player }
+    end
   end
 
+  # Defines all possible winning combinations.
+  def winning_combinations
+    [
+      %i[a1 a2 a3], %i[b1 b2 b3], %i[c1 c2 c3], # Rows
+      %i[a1 b1 c1], %i[a2 b2 c2], %i[a3 b3 c3], # Columns
+      %i[a1 b2 c3], %i[a3 b2 c1] # Diagonals
+    ]
+  end
 end
