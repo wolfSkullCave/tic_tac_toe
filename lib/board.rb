@@ -41,7 +41,7 @@ class Board
       positions[position] = value.colorize(:light_black)
     end
 
-    puts "board positions:".colorize(:yellow)
+    puts 'board positions:'.colorize(:yellow)
     draw(positions)
   end
 end

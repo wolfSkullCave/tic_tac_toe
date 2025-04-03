@@ -3,6 +3,9 @@
 require_relative 'board'
 require 'colorize'
 
+# The Play class handles the game logic for Tic Tac Toe.
+# It inherits from the board class and manages player turns,
+# validates moves, and checks for win or draw conditions.
 class Play < Board
   attr_accessor :player1, :player2
 
@@ -13,6 +16,8 @@ class Play < Board
   end
 
   def move
+    board_positions # display board co-ordinates (a1, a2, a3, etc.)
+
     [player1, player2].cycle do |current_player|
       break if turn(current_player)
     end
@@ -22,10 +27,9 @@ class Play < Board
 
   # Handles a player's turn and checks for game-ending conditions.
   def turn(player)
-    board_positions
-
     move_player(player)
-    draw
+    board_positions # display board co-ordinates (a1, a2, a3, etc.)
+    draw # Draw the current state of the board
     if winner?(player)
       puts "Player #{player} wins!".colorize(:yellow)
       true
